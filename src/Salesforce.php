@@ -7,6 +7,7 @@ use Frankkessler\Guzzle\Oauth2\GrantType\JwtBearer;
 use Frankkessler\Guzzle\Oauth2\GrantType\RefreshToken;
 use Frankkessler\Guzzle\Oauth2\Oauth2Client;
 use Frankkessler\Salesforce\Repositories\TokenRepository;
+use Psr\Log\LoggerInterface;
 
 class Salesforce
 {
@@ -42,6 +43,10 @@ class Salesforce
         $this->config_local = SalesforceConfig::get();
 
         $this->repository = new TokenRepository();
+
+        if (!empty($this->config_local['salesforce.logger']) && is_string($this->config_local['salesforce.logger'])) {
+            $this->config_local['salesforce.logger'] = new $this->config_local['salesforce.logger']('salesforce-rest');
+        }
 
         if (isset($this->config_local['base_uri'])) {
             $base_uri = $this->config_local['base_uri'];
@@ -405,7 +410,7 @@ class Salesforce
     }
 
     /**
-     * @return Query
+     * @return array|Query
      */
     public function query($legacy_query = null)
     {
@@ -583,11 +588,11 @@ class Salesforce
 
     protected function log($level, $message)
     {
-        if ($this->config_local['salesforce.logger'] instanceof \Psr\Log\LoggerInterface && is_callable([$this->config_local['salesforce.logger'], $level])) {
+        if ($this->config_local['salesforce.logger'] instanceof LoggerInterface && is_callable([$this->config_local['salesforce.logger'], $level])) {
             return call_user_func([$this->config_local['salesforce.logger'], $level], $message);
-        } else {
-            return;
         }
+
+        return null;
     }
 
     protected function updateAccessToken($current_access_token)

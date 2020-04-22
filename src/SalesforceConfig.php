@@ -2,7 +2,8 @@
 
 namespace Frankkessler\Salesforce;
 
-use Config;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 
 class SalesforceConfig
 {
@@ -52,13 +53,13 @@ class SalesforceConfig
     protected static function getInitialConfig()
     {
         if (class_exists('\Config')) {
-            $config = \Config::get('salesforce');
+            $config = Config::get('salesforce');
         } else {
             $config = include realpath(__DIR__.'/..').'/config/salesforce.php';
         }
         $config = ['salesforce' => $config];
 
-        return array_dot($config);
+        return Arr::dot($config);
     }
 
     public static function reset()
