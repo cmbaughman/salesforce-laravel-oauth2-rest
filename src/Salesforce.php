@@ -488,6 +488,8 @@ class Salesforce
 
             $headers = $response->getHeaders();
 
+            $api_limits = $headers['Sforce-Limit-Info'];
+
             $response_code = $response->getStatusCode();
 
             $data = [
@@ -516,6 +518,11 @@ class Salesforce
 
                 $data['success'] = true;
                 $data['http_status'] = 200;
+
+                if (sizeof($api_limits) > 0) {
+                  $data['api_limits'] = $this->getApiLimits($api_limits[0]);
+                }
+
             } elseif ($response_code == 201) {
                 if (is_array($response_array)) {
                     $data = array_replace($data, $response_array);
@@ -584,6 +591,21 @@ class Salesforce
         }
 
         return [];
+    }
+
+    protected function getApiLimits($api_usage) {
+      $array = explode("=", $api_usage);
+      $associativeArray = array($array[0] => $array[1]);
+      $percent = 0.00;
+
+      if (isset($associativeArray['api-usage'])) {
+        $fraction_string = $associativeArray['api-usage'];
+        list($numerator, $denominator) = explode('/', $fraction_string);
+        $dec = (float) $numerator / (float) $denominator;
+        $percent = sprintf('%.2f%%', $dec * 100);
+      }
+
+      return $percent;
     }
 
     protected function log($level, $message)

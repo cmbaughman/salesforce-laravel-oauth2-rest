@@ -32,6 +32,11 @@ class SalesforceBaseResponse extends BaseObject
      */
     protected $raw_sfdc_errors;
 
+    /**
+     * @var string
+     */
+    public $api_limits;
+
     public function __construct($data = [])
     {
         if (isset($data['raw_sfdc_error'])) {
@@ -44,6 +49,12 @@ class SalesforceBaseResponse extends BaseObject
             $this->http_status_code = (int) $data['http_status'];
             unset($data['http_status']);
         }
+
+        if (isset($data['sforce-limit-info'])) {
+            $this->api_limits = $data['sforce-limit-info'];
+            unset($data['sforce-limit-info']);
+        }
+
         parent::__construct($data);
 
         if (!$this->success && $this->http_status_code >= 200 && $this->http_status_code <= 299) {
