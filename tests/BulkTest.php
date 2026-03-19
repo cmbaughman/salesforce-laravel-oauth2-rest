@@ -303,11 +303,14 @@ class BulkTest extends \Mockery\Adapter\Phpunit\MockeryTestCase
 
     public function testBulkBinaryJobCreateWithMiddleware()
     {
-        copy(realpath('./tests/bulk_zip_files').'/zipped_dir.zip', realpath('./build').'/test.zip');
+        if (!is_dir('/tmp/build')) {
+            mkdir('/tmp/build', 0777, true);
+        }
+        copy(__DIR__.'/bulk_zip_files/zipped_dir.zip', '/tmp/build/test.zip');
 
         \Frankkessler\Salesforce\SalesforceConfig::reset();
-        GuzzleServer::flush();
         GuzzleServer::start();
+        GuzzleServer::flush();
 
         GuzzleServer::enqueue([
             new Response(200, [], json_encode($this->jobArray())),
@@ -334,7 +337,7 @@ class BulkTest extends \Mockery\Adapter\Phpunit\MockeryTestCase
         $objectType = 'Attachment';
 
         $binaryBatch = new \Frankkessler\Salesforce\DataObjects\BinaryBatch([
-            'batchZip' => realpath('./build').'/test.zip',
+            'batchZip' => '/tmp/build/test.zip',
         ]);
 
         $attachmentArray = json_decode($this->requestDotTxtContents());
@@ -365,8 +368,8 @@ class BulkTest extends \Mockery\Adapter\Phpunit\MockeryTestCase
                 case 5:
                     break;
                 case 2:
-                    file_put_contents(realpath('./build').'/test_download.zip', $response->getBody());
-                    $this->assertEquals(md5_file(realpath('./build').'/test.zip'), md5_file(realpath('./build').'/test_download.zip'));
+                    file_put_contents('/tmp/build/test_download.zip', $response->getBody());
+                    $this->assertEquals(md5_file('/tmp/build/test.zip'), md5_file('/tmp/build/test_download.zip'));
                     $this->assertEquals('THIS IS TEST DATA', $this->getTestText());
                     break;
                 default:
@@ -385,14 +388,14 @@ class BulkTest extends \Mockery\Adapter\Phpunit\MockeryTestCase
     public function getTestText()
     {
         $zip = new ZipArchive();
-        if ($zip->open(realpath('./build/test_download.zip'), \ZIPARCHIVE::CREATE) === true) {
-            $zip->extractTo(realpath('./build/'));
+        if ($zip->open('/tmp/build/test_download.zip', \ZIPARCHIVE::CREATE) === true) {
+            $zip->extractTo('/tmp/build/');
             $zip->close();
         } else {
             throw(new \Exception('Batch zip cannot be opened'));
         }
 
-        return file_get_contents(realpath('./build/').'/test.txt');
+        return file_get_contents('/tmp/build/test.txt');
     }
 
     public function jobArray($overrides = [])

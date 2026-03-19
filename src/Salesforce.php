@@ -488,7 +488,7 @@ class Salesforce
 
             $headers = $response->getHeaders();
 
-            $api_limits = $headers['Sforce-Limit-Info'];
+            $api_limits = $response->getHeader('Sforce-Limit-Info');
 
             $response_code = $response->getStatusCode();
 

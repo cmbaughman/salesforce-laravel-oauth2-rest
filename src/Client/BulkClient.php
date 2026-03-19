@@ -75,9 +75,7 @@ class BulkClient extends Oauth2Client
                         $token = $this->acquireAccessToken();
                         $this->setAccessToken($token, 'Bearer');
 
-                        $modify['set_headers']['X-SFDC-Session'] = $token->getToken();
-
-                        return Psr7\modify_request($request, $modify);
+                        return $request->withHeader('X-SFDC-Session', $token->getToken());
                     }
                 }
 

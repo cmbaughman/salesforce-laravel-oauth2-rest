@@ -9,7 +9,7 @@ include __DIR__.'/../migrations/salesforce.php';
 
 class DbTest extends \Mockery\Adapter\Phpunit\MockeryTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -96,8 +96,8 @@ class DbTest extends \Mockery\Adapter\Phpunit\MockeryTestCase
     public function testBulkJobCreateWithMiddleware()
     {
         \Frankkessler\Salesforce\SalesforceConfig::reset();
-        GuzzleServer::flush();
         GuzzleServer::start();
+        GuzzleServer::flush();
 
         GuzzleServer::enqueue([
             new Response(401, [], $this->returnInvalidGrant()),
