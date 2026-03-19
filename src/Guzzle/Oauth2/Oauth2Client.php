@@ -66,7 +66,7 @@ class Oauth2Client extends Client
             return $request;
         }), 'add_oauth_header');
 
-        $handler->before('add_oauth_header', $this->retry_modify_request(function ($retries, RequestInterface $request, ResponseInterface $response = null, $error = null) {
+        $handler->before('add_oauth_header', $this->retry_modify_request(function ($retries, RequestInterface $request, ?ResponseInterface $response = null, $error = null) {
             if ($retries > 0) {
                 return false;
             }
@@ -98,7 +98,7 @@ class Oauth2Client extends Client
     /**
      * Retry Call after updating access token.
      */
-    public function retry_modify_request(callable $decider, callable $requestModifier, callable $delay = null)
+    public function retry_modify_request(callable $decider, callable $requestModifier, ?callable $delay = null)
     {
         return function (callable $handler) use ($decider, $requestModifier, $delay) {
             return new RetryModifyRequestMiddleware($decider, $requestModifier, $handler, $delay);
@@ -243,6 +243,8 @@ class Oauth2Client extends Client
         } elseif ($response->getStatusCode() == 401) {
             throw(new InvalidGrantException('invalid_grant', (isset($data['status_code'])) ? $data['status_code'] : 0));
         }
+
+        throw new \Exception('Failed to parse token response. HTTP ' . $response->getStatusCode() . ': ' . (string)$response->getBody());
     }
 
     public function setGrantType(GrantTypeBase $grantType)

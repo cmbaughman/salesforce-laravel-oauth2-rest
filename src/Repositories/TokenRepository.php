@@ -7,6 +7,8 @@ use Frankkessler\Salesforce\SalesforceConfig;
 
 class TokenRepository
 {
+    public $store;
+
     public function __construct($config = [])
     {
         $this->store = $this->setStore($config);
@@ -27,5 +29,10 @@ class TokenRepository
     public function createEloquentDriver($config = [])
     {
         return new TokenEloquentRepository();
+    }
+    
+    public function createArrayDriver($config = [])
+    {
+        return new \Frankkessler\Salesforce\Repositories\Array\TokenArrayRepository();
     }
 }

@@ -35,6 +35,8 @@ class Salesforce
      */
     private $bulk_api;
 
+    public $repository;
+
     public function __construct($config = null)
     {
         //Allow custom config to be applied through the constructor
@@ -83,8 +85,10 @@ class Salesforce
         $access_token = SalesforceConfig::get('salesforce.oauth.access_token');
         $refresh_token = SalesforceConfig::get('salesforce.oauth.refresh_token');
 
-        //Set access token and refresh token in Guzzle oauth client
-        $this->oauth2Client->setAccessToken($access_token, $access_token_type = 'Bearer');
+        //Set access token and refresh token in Guzzle oauth client ONLY if they actually exist
+        if ($access_token) {
+            $this->oauth2Client->setAccessToken($access_token, $access_token_type = 'Bearer');
+        }
 
         if (isset($this->config_local['token_url'])) {
             $token_url = $this->config_local['token_url'];
@@ -107,6 +111,26 @@ class Salesforce
                 ],
             ];
             $grantType = new JwtBearer($jwt_token_config);
+            $this->oauth2Client->setGrantType($grantType);
+        } elseif (SalesforceConfig::get('salesforce.oauth.auth_type') == 'client_credentials') {
+            $cc_config = [
+                'client_id'     => SalesforceConfig::get('salesforce.oauth.client_id') ?: SalesforceConfig::get('salesforce.oauth.consumer_token'),
+                'client_secret' => SalesforceConfig::get('salesforce.oauth.client_secret') ?: SalesforceConfig::get('salesforce.oauth.consumer_secret'),
+                'token_url'     => $token_url,
+                'auth_location' => 'body',
+            ];
+            $grantType = new \Frankkessler\Guzzle\Oauth2\GrantType\ClientCredentials($cc_config);
+            $this->oauth2Client->setGrantType($grantType);
+        } elseif (SalesforceConfig::get('salesforce.oauth.auth_type') == 'password') {
+            $pw_config = [
+                'client_id'     => SalesforceConfig::get('salesforce.oauth.client_id') ?: SalesforceConfig::get('salesforce.oauth.consumer_token'),
+                'client_secret' => SalesforceConfig::get('salesforce.oauth.client_secret') ?: SalesforceConfig::get('salesforce.oauth.consumer_secret'),
+                'username'      => SalesforceConfig::get('salesforce.oauth.username'),
+                'password'      => SalesforceConfig::get('salesforce.oauth.password'),
+                'token_url'     => $token_url,
+                'auth_location' => 'body',
+            ];
+            $grantType = new \Frankkessler\Guzzle\Oauth2\GrantType\PasswordCredentials($pw_config);
             $this->oauth2Client->setGrantType($grantType);
         } else {  //web_server is default auth type
             $this->oauth2Client->setRefreshToken($refresh_token);
@@ -502,9 +526,15 @@ class Salesforce
             ];
 
             if ($format == 'xml') {
+                libxml_use_internal_errors(true);
                 $xml = simplexml_load_string((string) $response->getBody(), null, LIBXML_NOCDATA);
-                $json = json_encode($xml);
-                $response_array = json_decode($json, true);
+                libxml_clear_errors();
+                if ($xml !== false) {
+                    $json = json_encode($xml);
+                    $response_array = json_decode($json, true);
+                } else {
+                    $response_array = (string) $response->getBody();
+                }
             } elseif ($format == 'csv') {
                 $response_array = csvToArray((string) $response->getBody(), $lowerCaseHeaders);
             } else {

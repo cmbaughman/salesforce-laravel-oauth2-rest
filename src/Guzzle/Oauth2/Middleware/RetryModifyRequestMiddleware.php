@@ -12,6 +12,9 @@ use Psr\Http\Message\RequestInterface;
  */
 class RetryModifyRequestMiddleware
 {
+    private $requestModifier;
+    private $delay;
+
     /** @var callable */
     private $nextHandler;
 
@@ -33,7 +36,7 @@ class RetryModifyRequestMiddleware
         callable $decider,
         callable $requestModifier,
         callable $nextHandler,
-        callable $delay = null
+        ?callable $delay = null
     ) {
         $this->decider = $decider;
         $this->requestModifier = $requestModifier;

@@ -55,7 +55,7 @@ if (!function_exists('str_putcsv')) {
     {
         $fp = fopen('php://temp', 'r+b');
         foreach ($input as $row) {
-            fputcsv($fp, $row, $delimiter, $enclosure);
+            fputcsv($fp, $row, $delimiter, $enclosure, "\\");
             fwrite($fp, "\r\n");
         }
         rewind($fp);
@@ -69,7 +69,7 @@ if (!function_exists('str_putcsv')) {
 if (!function_exists('csvToArray')) {
     function csvToArray($csv_string, $lowerCaseHeaders = false)
     {
-        $csv = array_map('str_getcsv', explode("\n", $csv_string));
+        $csv = array_map(function($line) { return str_getcsv($line, ',', '"', "\\"); }, explode("\n", $csv_string));
         $header = array_shift($csv);
 
         if ($lowerCaseHeaders) {
