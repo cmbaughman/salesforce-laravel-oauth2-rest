@@ -35,6 +35,8 @@ class Salesforce
      */
     private $bulk_api;
 
+    public $repository;
+
     public function __construct($config = null)
     {
         //Allow custom config to be applied through the constructor

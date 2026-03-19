@@ -57,7 +57,7 @@ class BulkClient extends Oauth2Client
 
     public function modifyRequest()
     {
-        return $this->retry_modify_request(function ($retries, RequestInterface $request, ResponseInterface $response = null, $error = null) {
+        return $this->retry_modify_request(function ($retries, RequestInterface $request, ?ResponseInterface $response = null, $error = null) {
             if ($retries > 0) {
                 return false;
             }

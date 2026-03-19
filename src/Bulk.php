@@ -10,6 +10,9 @@ use Frankkessler\Salesforce\Responses\Bulk\BulkJobResponse;
 
 class Bulk extends Salesforce
 {
+    public $base_uri;
+    public $bulk_base_uri;
+
     public function __construct($config = [])
     {
         if (isset($config['bulk_base_uri'])) {
@@ -92,7 +95,7 @@ class Bulk extends Salesforce
                 if (in_array($batch->state, ['Completed', 'Failed', 'Not Processed', 'NotProcessed'])) {
                     if (in_array($batch->state, ['Completed'])) {
                         $batchResult = $this->batchResult($job->id, $batch->id, $options['isBatchedResult'], null, $options['contentType']);
-                        if (class_exists($options['batchProcessor']) && class_implements($options['batchProcessor'], '\Frankkessler\Salesforce\Interfaces\BulkBatchProcessorInterface')) {
+                        if (is_string($options['batchProcessor']) && class_exists($options['batchProcessor']) && is_subclass_of($options['batchProcessor'], '\Frankkessler\Salesforce\Interfaces\BulkBatchProcessorInterface')) {
                             call_user_func([$options['batchProcessor'], 'process'], $batchResult);
                         } else {
                             $batch->records = $batchResult->records;
