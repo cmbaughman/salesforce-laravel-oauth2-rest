@@ -1,27 +1,27 @@
 <?php
 
 
-class HelperTest extends \PHPUnit_Framework_TestCase
+class HelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testEnv()
     {
         putenv('var_true=true');
         putenv('var_false=false');
 
-        $this->assertSame(true, env('var_true'));
-        $this->assertSame(false, env('var_false'));
-        $this->assertSame('', env('var_empty'));
-        $this->assertSame(null, env('var_null'));
+        $this->assertEquals(true, env('var_true'));
+        $this->assertEquals(false, env('var_false'));
+        $this->assertEquals('', env('var_empty'));
+        $this->assertEquals(null, env('var_null'));
 
-        $this->assertSame(true, env('var_true_parentheses'));
-        $this->assertSame(false, env('var_false_parentheses'));
-        $this->assertSame('', env('var_empty_parentheses'));
-        $this->assertSame(null, env('var_null_parentheses'));
+        $this->assertEquals(true, env('var_true_parentheses'));
+        $this->assertEquals(false, env('var_false_parentheses'));
+        $this->assertEquals('', env('var_empty_parentheses'));
+        $this->assertEquals(null, env('var_null_parentheses'));
 
         putenv('var_quotes="quotes"');
-        $this->assertSame('quotes', env('var_quotes'));
+        $this->assertEquals('quotes', env('var_quotes'));
 
         putenv('var_basic=basic_test');
-        $this->assertSame('basic_test', env('var_basic'));
+        $this->assertEquals('basic_test', env('var_basic'));
     }
 }
