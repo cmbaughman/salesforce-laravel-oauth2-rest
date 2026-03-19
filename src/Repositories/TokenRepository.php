@@ -30,4 +30,9 @@ class TokenRepository
     {
         return new TokenEloquentRepository();
     }
+    
+    public function createArrayDriver($config = [])
+    {
+        return new \Frankkessler\Salesforce\Repositories\Array\TokenArrayRepository();
+    }
 }

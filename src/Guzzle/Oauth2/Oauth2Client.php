@@ -243,6 +243,8 @@ class Oauth2Client extends Client
         } elseif ($response->getStatusCode() == 401) {
             throw(new InvalidGrantException('invalid_grant', (isset($data['status_code'])) ? $data['status_code'] : 0));
         }
+
+        throw new \Exception('Failed to parse token response. HTTP ' . $response->getStatusCode() . ': ' . (string)$response->getBody());
     }
 
     public function setGrantType(GrantTypeBase $grantType)
