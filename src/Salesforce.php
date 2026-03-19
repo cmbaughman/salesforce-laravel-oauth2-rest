@@ -504,9 +504,15 @@ class Salesforce
             ];
 
             if ($format == 'xml') {
+                libxml_use_internal_errors(true);
                 $xml = simplexml_load_string((string) $response->getBody(), null, LIBXML_NOCDATA);
-                $json = json_encode($xml);
-                $response_array = json_decode($json, true);
+                libxml_clear_errors();
+                if ($xml !== false) {
+                    $json = json_encode($xml);
+                    $response_array = json_decode($json, true);
+                } else {
+                    $response_array = (string) $response->getBody();
+                }
             } elseif ($format == 'csv') {
                 $response_array = csvToArray((string) $response->getBody(), $lowerCaseHeaders);
             } else {

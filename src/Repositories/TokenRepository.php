@@ -7,6 +7,8 @@ use Frankkessler\Salesforce\SalesforceConfig;
 
 class TokenRepository
 {
+    public $store;
+
     public function __construct($config = [])
     {
         $this->store = $this->setStore($config);
