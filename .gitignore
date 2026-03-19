@@ -2,4 +2,4 @@ vendor/*
 composer.lock
 .idea/*
 build/*
-./example_live_test.php
+example_live_test.php
