@@ -42,5 +42,15 @@
       "tests/GuzzleServer.php",
       "tests/BulkBatchProcessor.php"
     ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Frankkessler\\Salesforce\\Providers\\SalesforceLaravelServiceProvider"
+      ],
+      "aliases": {
+        "Salesforce": "Frankkessler\\Salesforce\\Facades\\Salesforce"
+      }
+    }
   }
 }
