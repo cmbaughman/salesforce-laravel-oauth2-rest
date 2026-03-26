@@ -3,6 +3,55 @@
 [![StyleCI](https://styleci.io/repos/42465034/shield)](https://styleci.io/repos/42465034)
 [![Latest Stable Version](https://img.shields.io/packagist/v/frankkessler/salesforce-laravel-oauth2-rest.svg)](https://packagist.org/packages/frankkessler/salesforce-laravel-oauth2-rest)
 
+# Important
+
+I have been maintaining this fork of a library, originally by https://github.com/frankkessler, since Laravel 6 or so. I am currently rewriting a huge portion of it which isn't public yet; but O do have much of it updated now for Laravel 12! I am using this version it in a few other projects as well. I've attempted to send the original author many pull requests, and other correspondences but haven't heard anything so I guess I am just going to start maintaining this fork for now, but will probably rename the packages and such during the rewrite. This was needed because I didn't have much luck with the other Laravel Salesforce libs, and absolutely love the setup and support for JWT authentication with Salesforce. 
+
+I have not really started rewriting the Oauth v2 bits, so you have been warned. They *should* work with the modifications I made for Laravel 12, but I have not had a good opportunity to test. If you do get to use them, let me know how it went. Thanks!
+
+## Using This Fork
+
+Using this fork is pretty easy. Update your `composer.json` like this to add this repo to a "repositories" section,
+and add the line `"cmbaughman/salesforce-laravel-oauth2-rest": "dev-laravel12",` to your "requires" section like this:
+
+```javascript
+"repositories": [
+    {
+        "type": "vcs",
+        "url": "git@github.com:cmbaughman/salesforce-laravel-oauth2-rest.git"
+    }
+],
+"require": {
+    "php": "^8.4.0",
+    "cmbaughman/salesforce-laravel-oauth2-rest": "dev-laravel12",
+    
+},
+...
+```
+
+Then run `composer install`.
+
+After that, to get the `config/salesforce.php` run `php artisan vendor:publish --provider="Frankkessler\Salesforce\Providers\SalesforceLaravelServiceProvider"` 
+
+Then you should populate these in your project's `.env` and you will be good to go!
+
+```
+# Salesforce Integration (Client Credentials / Password flow)
+SALESFORCE_CONSUMER_KEY=your_client_id_here
+SALESFORCE_CONSUMER_SECRET=your_client_secret_here
+SALESFORCE_LOGIN_URL=https://login.salesforce.com
+# Use test.salesforce.com if connecting to a sandbox!
+
+SALESFORCE_USERNAME=your_username
+SALESFORCE_PASSWORD=your_password
+SALESFORCE_SECURITY_TOKEN=your_security_token
+```
+
+Below you will find the original `README.md`. I will keep updating and get the rest of this documentation updated soon. 
+
+Thanks for using!
+
+
 # RUNNING UNIT TESTS
 
 There are currently two ways to run the unit tests.  Keep in mind that node is a dependency for running the unit tests regardless of which way you want to run them.
